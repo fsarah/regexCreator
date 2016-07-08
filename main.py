@@ -46,6 +46,14 @@ def simplify(input_summary):
 
     return simplified_summary
 
+def vagueify(input_summary):
+    for line in input_summary:
+        if len(input_summary[line]) > 1:
+            numbers = 0
+            for char in input_summary[line]:
+                if char.isdigit():
+                    numbers += 1
+
 def create_regex(input_summary, shortest_input_length, longest_input_length):
     regex = ""
     input_len = 0
@@ -102,5 +110,7 @@ input_summary = simplify(input_summary)
 #for line in input_summary:
 #    print input_summary[line]
 
-regex = create_regex(input_summary, shortest_input_len, longest_input_len)
-print regex
+vague_summary = vagueify(input_summary)
+
+exact_regex = create_regex(input_summary, shortest_input_len, longest_input_len)
+print exact_regex
