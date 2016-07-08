@@ -7,17 +7,19 @@ def handle_line(input_count, line, input_summary):
 
     for char in line:
         list = input_summary.get(input_len)
+
         updated_list = []
 
         if list is not None:
             for item in list:
                 updated_list.append(item)
 
+        if char != '\n':
             updated_list.append(char)
+
         input_summary[input_len] = updated_list
         input_len += 1
 
-    print(line)
     return input_summary
 
 def simplify(input_summary):
@@ -44,13 +46,33 @@ def simplify(input_summary):
 
     return simplified_summary
 
-def create_regex(input_summary):
+def create_regex(input_summary, shortest_input_length, longest_input_length):
+    regex = ""
+    input_len = 0
+
     for line in input_summary:
+        input_len += 1
         elements = input_summary[line]
+
         if len(elements) == 1:
-            print "here"
-        else:
-            print len(elements)
+            if input_len <= shortest_input_len:
+                regex = regex + elements[0]
+            else:
+                regex = regex + "(" + elements[0] + ")?"
+        elif len(elements) > 1:
+            tmp = ""
+            for element in elements:
+                if tmp == "":
+                    tmp = tmp + element
+                else:
+                    tmp = tmp + "|" + element
+            if input_len <= shortest_input_len:
+                regex = regex + "(" + tmp + ")"
+            else:
+                regex = regex + "(" + tmp + ")?"
+
+    return regex
+
 
 # Main Function
 f = open('test.txt', 'r')
@@ -67,8 +89,18 @@ for line in f:
 #for line in input_summary:
 #    print(input_summary[line])
 
-input_summary = simplify(input_summary)
+baseline = len(input_summary[0])
 for line in input_summary:
-    print input_summary[line]
+    if len(input_summary[line]) == baseline:
+        shortest_input_len += 1
+    longest_input_len += 1
 
-create_regex(input_summary)
+#print longest_input_len
+#print shortest_input_len
+
+input_summary = simplify(input_summary)
+#for line in input_summary:
+#    print input_summary[line]
+
+regex = create_regex(input_summary, shortest_input_len, longest_input_len)
+print regex
