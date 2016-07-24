@@ -47,12 +47,22 @@ def simplify(input_summary):
     return simplified_summary
 
 def vagueify(input_summary):
+    print input_summary
     for line in input_summary:
         if len(input_summary[line]) > 1:
             numbers = 0
+            chars = 0
             for char in input_summary[line]:
                 if char.isdigit():
                     numbers += 1
+                if char.isalpha():
+                    chars += 1
+            if numbers > 1 and chars == 0:
+                input_summary[line] = "(0-9)"
+            elif numbers > 1 and chars > 1:
+                input_summary[line] = "(0-9)|(a-z)"
+            elif numbers == 0 and chars > 0:
+                input_summary[line] = "(a-z)"
 
 def create_regex(input_summary, shortest_input_length, longest_input_length):
     regex = ""
