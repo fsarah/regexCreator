@@ -1,5 +1,5 @@
 import os
-
+import re
 
 # Handles lines:
 def handle_line(input_count, line, input_summary):
@@ -77,17 +77,42 @@ def vagueify(input_summary):
     return input_summary
 
 def summarize(vague_summary):
-  print(vague_summary)
+  print("vague_summary: ", vague_summary)
+  reg = re.compile(r'(.*)[*]')
+
   for line in vague_summary:
-    if line > 0 and vague_summary[line] == vague_summary[line - 1]:
-      vague_summary[line] = []
-#      if vague_summary[line - 1] DOESN'T HAVE A STAR AT THE END
-      #temp_string = vague_summary[line - 1]
-      #temp_string = temp_string + "*"
-      #vague_summary[line - 1] = temp_string
-      print(vague_summary[line - 1])
+    if line > 0:
+      val1 = vague_summary[line]
+      val2 = vague_summary[line - 1]
+      tempval = ""
 
+      if re.match(r"[(]", str(val1)):
+        for i in 1, (len(val1) - 1):
+          tempval += val1[i]
+        val1 = tempval
 
+      tempval = ""
+      if re.match(r"[(]", str(val2)):
+        for i in 1, (len(val1) - 1):
+          tempval += val1[i]
+        val1 = tempval
+
+      if len(val2) > len(val1):
+        temp = val1
+        val1 = val2
+        val2 = temp
+
+      reg_ex = str(val2).strip('[]')
+      reg = re.compile(reg_ex)
+      if re.match(reg, str(val1).strip('[]')):
+        print(reg)
+        print(val1)
+        vague_summary[line] = []
+        if not re.search(reg, str(vague_summary[line-1])):
+          print("here6")
+          temp_string = vague_summary[line-1]
+          temp_string += "*"
+          vague_summary[line - 1] = "(" + temp_string + ")"
 
 def create_regex(input_summary, shortest_input_length, longest_input_length):
     regex = ""
@@ -96,11 +121,13 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
     for line in input_summary:
         input_len += 1
         elements = input_summary[line]
+        reg = re.compile(r'[(].*[)]')
 
         if len(elements) == 1:
             if input_len <= shortest_input_len:
                 regex = regex + elements[0]
-            #else if regex is already in brackets
+            elif re.search(reg, elements[0]):
+                regex += elements[0]
             else:
                 regex = regex + "(" + elements[0] + ")?"
         elif len(elements) > 1:
@@ -116,7 +143,6 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
             else:
                 regex = regex + "(" + tmp + ")?"
     return regex
-
 
 # Main Function
 f = open('test.txt', 'r')
