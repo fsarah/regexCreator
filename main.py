@@ -7,7 +7,6 @@ def handle_line(input_count, line, input_summary):
 
     for char in line:
         list = input_summary.get(input_len)
-
         updated_list = []
 
         if list is not None:
@@ -17,8 +16,9 @@ def handle_line(input_count, line, input_summary):
         if char != '\n':
             updated_list.append(char)
 
-        input_summary[input_len] = updated_list
-        input_len += 1
+        if len(updated_list) > 0:
+            input_summary[input_len] = updated_list
+            input_len += 1
 
     return input_summary
 
@@ -43,7 +43,6 @@ def simplify(input_summary):
                     new_list.append(element)
 
         simplified_summary[line] = new_list
-
     return simplified_summary
 
 def vagueify(input_summary):
@@ -52,11 +51,15 @@ def vagueify(input_summary):
         if len(input_summary[line]) > 1:
             numbers = 0
             chars = 0
+            number_array = []
+            char_array = []
             for char in input_summary[line]:
                 if char.isdigit():
                     numbers += 1
+                    number_array.append(char)
                 if char.isalpha():
                     chars += 1
+                    char_array.append(char)
             if numbers > 1 and chars == 0:
                 input_summary[line] = []
                 input_summary[line].append("(0-9)")
@@ -66,11 +69,11 @@ def vagueify(input_summary):
             elif numbers > 1 and chars == 1:
                 input_summary[line] = []
                 input_summary[line].append("(0-9)")
-                input_summary[line].append("char") #TODO
+                input_summary[line].append(char_array.pop(0))
             elif numbers == 1 and chars > 1:
                 input_summary[line] = []
                 input_summary[line].append("(a-z)")
-                input_summary[line].append("number") #todo
+                input_summary[line].append(number_array.pop(0))
             elif numbers == 0 and chars > 0:
                 input_summary[line] = []
                 input_summary[line].append("(a-z)")
@@ -78,7 +81,7 @@ def vagueify(input_summary):
 
 def summarize(vague_summary):
   print("vague_summary: ", vague_summary)
-  reg = re.compile(r'(.*)[*]')
+  reg_star = re.compile(r'(.*)[*]')
 
   for line in vague_summary:
     if line > 0:
@@ -103,16 +106,15 @@ def summarize(vague_summary):
         val2 = temp
 
       reg_ex = str(val2).strip('[]')
-      reg = re.compile(reg_ex)
+      reg = re.compile(r'{}'.format(reg_ex))
       if re.match(reg, str(val1).strip('[]')):
-        print(reg)
-        print(val1)
         vague_summary[line] = []
-        if not re.search(reg, str(vague_summary[line-1])):
-          print("here6")
-          temp_string = vague_summary[line-1]
+        if not re.search(reg_star, str(vague_summary[line-1])):
+          temp_string = str(vague_summary[line-1]).strip('[]')
           temp_string += "*"
-          vague_summary[line - 1] = "(" + temp_string + ")"
+          print(temp_string)
+          print("(" + str(temp_string) + ")")
+          vague_summary[line - 1] = "(" + str(temp_string) + ")"
 
 def create_regex(input_summary, shortest_input_length, longest_input_length):
     regex = ""
@@ -145,7 +147,7 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
     return regex
 
 # Main Function
-f = open('test.txt', 'r')
+f = open('test2.txt', 'r')
 
 input_count = 0
 longest_input_len = 0
@@ -156,21 +158,13 @@ for line in f:
     input_summary = handle_line(input_count, line, input_summary)
     input_count += 1
 
-#for line in input_summary:
-#    print(input_summary[line])
-
 baseline = len(input_summary[0])
 for line in input_summary:
     if len(input_summary[line]) == baseline:
         shortest_input_len += 1
     longest_input_len += 1
 
-#print longest_input_len
-#print shortest_input_len
-
 input_summary = simplify(input_summary)
-#for line in input_summary:
-#    print input_summary[line]
 
 vague_summary = vagueify(input_summary)
 summarized_summary = summarize(vague_summary)

@@ -1,0 +1,4 @@
+aab1
+aba2
+a1b1
+aa2c
