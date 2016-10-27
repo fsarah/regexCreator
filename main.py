@@ -147,7 +147,7 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
     return regex
 
 # Main Function
-f = open('test2.txt', 'r')
+f = open('\tests\test3.txt', 'r')
 
 input_count = 0
 longest_input_len = 0
