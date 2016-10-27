@@ -115,6 +115,7 @@ def summarize(vague_summary):
           print(temp_string)
           print("(" + str(temp_string) + ")")
           vague_summary[line - 1] = "(" + str(temp_string) + ")"
+  return vague_summary
 
 def create_regex(input_summary, shortest_input_length, longest_input_length):
     regex = ""
@@ -129,7 +130,7 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
             if input_len <= shortest_input_len:
                 regex = regex + elements[0]
             elif re.search(reg, elements[0]):
-                regex += elements[0]
+                regex += elements[0] + "?"
             else:
                 regex = regex + "(" + elements[0] + ")?"
         elif len(elements) > 1:
@@ -147,7 +148,7 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
     return regex
 
 # Main Function
-f = open('\tests\test3.txt', 'r')
+f = open('test3.txt', 'r')
 
 input_count = 0
 longest_input_len = 0
@@ -165,9 +166,13 @@ for line in input_summary:
     longest_input_len += 1
 
 input_summary = simplify(input_summary)
+print("input summary: ", input_summary)
 
 vague_summary = vagueify(input_summary)
+print("vague summary: ", vague_summary)
+
 summarized_summary = summarize(vague_summary)
+print("summarized summary: ", summarized_summary)
 
 exact_regex = create_regex(input_summary, shortest_input_len, longest_input_len)
-print (exact_regex)
+print(exact_regex)
