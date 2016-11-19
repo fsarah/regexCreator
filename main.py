@@ -45,8 +45,9 @@ def simplify(input_summary):
         simplified_summary[line] = new_list
     return simplified_summary
 
+#if more than certain number of letters/numbers, replace with [a-z] or [0-9]
 def vagueify(input_summary):
-    print (input_summary)
+#    print (input_summary)
     for line in input_summary:
         if len(input_summary[line]) > 1:
             numbers = 0
@@ -79,8 +80,9 @@ def vagueify(input_summary):
                 input_summary[line].append("(a-z)")
     return input_summary
 
+# if multiple occurences of same possibilities right after each other, only add one with an asterisk
 def summarize(vague_summary):
-  print("vague_summary: ", vague_summary)
+#  print("vague_summary: ", vague_summary)
   reg_star = re.compile(r'(.*)[*]')
 
   for line in vague_summary:
@@ -89,6 +91,8 @@ def summarize(vague_summary):
       val2 = vague_summary[line - 1]
       tempval = ""
 
+#      print("val1: ", val1)
+#      print("val2: ", val2)
       if re.match(r"[(]", str(val1)):
         for i in 1, (len(val1) - 1):
           tempval += val1[i]
@@ -105,17 +109,26 @@ def summarize(vague_summary):
         val1 = val2
         val2 = temp
 
-      reg_ex = str(val2).strip('[]')
-      reg = re.compile(r'{}'.format(reg_ex))
-      if re.match(reg, str(val1).strip('[]')):
+      reg_ex = str(val2).strip('[\'\']')
+#      reg = re.compile(r'{}'.format(reg_ex))
+      if reg_ex == str(val1).strip('[\'\']'):
+      #if re.match(reg, str(val1).strip('[\'\']')):
+        #print("val1 & val2 match")
         vague_summary[line] = []
         if not re.search(reg_star, str(vague_summary[line-1])):
           temp_string = str(vague_summary[line-1]).strip('[]')
           temp_string = temp_string.strip('\'') + "*"
-          vague_summary[line - 1] = "(" + str(temp_string) + ")"
-  return vague_summary
+          vague_summary[line - 1] = [temp_string]
+
+  decluttered_list = {}
+  for element in vague_summary:
+    if len(vague_summary[element]) > 0:
+        decluttered_list[element] = vague_summary[element]
+
+  return decluttered_list
 
 def create_regex(input_summary, shortest_input_length, longest_input_length):
+#    print("create_regex: ", input_summary)
     regex = ""
     input_len = 0
 
@@ -125,7 +138,7 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
         reg = re.compile(r'[(].*[)]')
 
         if len(elements) == 1:
-            if input_len <= shortest_input_len:
+            if input_len <= shortest_input_length:
                 regex = regex + elements[0]
             elif re.search(reg, elements[0]):
                 regex += elements[0] + "?"
@@ -139,7 +152,7 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
                     tmp = tmp + element
                 else:
                     tmp = tmp + "|" + element
-            if input_len <= shortest_input_len:
+            if input_len <= shortest_input_length:
                 regex = regex + "(" + tmp + ")"
             else:
                 regex = regex + "(" + tmp + ")?"
@@ -168,7 +181,6 @@ input_summary = simplify(input_summary)
 vague_summary = vagueify(input_summary)
 
 summarized_summary = summarize(vague_summary)
-print(summarized_summary)
 
-exact_regex = create_regex(input_summary, shortest_input_len, longest_input_len)
+exact_regex = create_regex(summarized_summary, shortest_input_len, longest_input_len)
 print(exact_regex)
