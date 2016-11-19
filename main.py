@@ -111,9 +111,7 @@ def summarize(vague_summary):
         vague_summary[line] = []
         if not re.search(reg_star, str(vague_summary[line-1])):
           temp_string = str(vague_summary[line-1]).strip('[]')
-          temp_string += "*"
-          print(temp_string)
-          print("(" + str(temp_string) + ")")
+          temp_string = temp_string.strip('\'') + "*"
           vague_summary[line - 1] = "(" + str(temp_string) + ")"
   return vague_summary
 
@@ -148,7 +146,7 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
     return regex
 
 # Main Function
-f = open('test3.txt', 'r')
+f = open('test.txt', 'r')
 
 input_count = 0
 longest_input_len = 0
@@ -166,13 +164,11 @@ for line in input_summary:
     longest_input_len += 1
 
 input_summary = simplify(input_summary)
-print("input summary: ", input_summary)
 
 vague_summary = vagueify(input_summary)
-print("vague summary: ", vague_summary)
 
 summarized_summary = summarize(vague_summary)
-print("summarized summary: ", summarized_summary)
+print(summarized_summary)
 
 exact_regex = create_regex(input_summary, shortest_input_len, longest_input_len)
 print(exact_regex)
