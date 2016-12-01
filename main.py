@@ -2,7 +2,7 @@ import os
 import re
 
 # Handles lines:
-def handle_line(input_count, line, input_summary):
+def handle_line(line, input_summary):
     input_len = 0
 
     for char in line:
@@ -47,7 +47,6 @@ def simplify(input_summary):
 
 #if more than certain number of letters/numbers, replace with [a-z] or [0-9]
 def vagueify(input_summary):
-#    print (input_summary)
     for line in input_summary:
         if len(input_summary[line]) > 1:
             numbers = 0
@@ -66,7 +65,7 @@ def vagueify(input_summary):
                 input_summary[line].append("(0-9)")
             elif numbers > 1 and chars > 1:
                 input_summary[line] = []
-                input_summary[line].append("(0-9)|(a-z)")
+                input_summary[line].append("((0-9)|(a-z))")
             elif numbers > 1 and chars == 1:
                 input_summary[line] = []
                 input_summary[line].append("(0-9)")
@@ -82,8 +81,9 @@ def vagueify(input_summary):
 
 # if multiple occurences of same possibilities right after each other, only add one with an asterisk
 def summarize(vague_summary):
-#  print("vague_summary: ", vague_summary)
+  changes = False
   reg_star = re.compile(r'(.*)[*]')
+  pop_these = []
 
   for line in vague_summary:
     if line > 0:
@@ -91,8 +91,6 @@ def summarize(vague_summary):
       val2 = vague_summary[line - 1]
       tempval = ""
 
-#      print("val1: ", val1)
-#      print("val2: ", val2)
       if re.match(r"[(]", str(val1)):
         for i in 1, (len(val1) - 1):
           tempval += val1[i]
@@ -110,25 +108,27 @@ def summarize(vague_summary):
         val2 = temp
 
       reg_ex = str(val2).strip('[\'\']')
-#      reg = re.compile(r'{}'.format(reg_ex))
       if reg_ex == str(val1).strip('[\'\']'):
-      #if re.match(reg, str(val1).strip('[\'\']')):
-        #print("val1 & val2 match")
         vague_summary[line] = []
         if not re.search(reg_star, str(vague_summary[line-1])):
           temp_string = str(vague_summary[line-1]).strip('[]')
           temp_string = temp_string.strip('\'') + "*"
           vague_summary[line - 1] = [temp_string]
+          pop_these.append(line)
+        changes = True
 
-  decluttered_list = {}
+  decluttered_list = []
   for element in vague_summary:
-    if len(vague_summary[element]) > 0:
-        decluttered_list[element] = vague_summary[element]
+      if len(vague_summary[element]) > 0:
+        decluttered_list.append(vague_summary[element])
 
-  return decluttered_list
+  dictionary = {}
+  for i in range(0, len(decluttered_list)):
+      dictionary[i] = decluttered_list[i]
+
+  return (changes, dictionary)
 
 def create_regex(input_summary, shortest_input_length, longest_input_length):
-#    print("create_regex: ", input_summary)
     regex = ""
     input_len = 0
 
@@ -159,28 +159,35 @@ def create_regex(input_summary, shortest_input_length, longest_input_length):
     return regex
 
 # Main Function
-f = open('test.txt', 'r')
+def main():
+    f = open('test4.txt', 'r')
 
-input_count = 0
-longest_input_len = 0
-shortest_input_len = 0
-input_summary = {}
+    input_count = 0
+    longest_input_len = 0
+    shortest_input_len = 0
+    input_summary = {}
 
-for line in f:
-    input_summary = handle_line(input_count, line, input_summary)
-    input_count += 1
+    for line in f:
+        input_summary = handle_line(line, input_summary)
+        input_count += 1
 
-baseline = len(input_summary[0])
-for line in input_summary:
-    if len(input_summary[line]) == baseline:
-        shortest_input_len += 1
-    longest_input_len += 1
+    baseline = len(input_summary[0])
+    for line in input_summary:
+        if len(input_summary[line]) == baseline:
+            shortest_input_len += 1
+        longest_input_len += 1
 
-input_summary = simplify(input_summary)
+    input_summary = simplify(input_summary)
 
-vague_summary = vagueify(input_summary)
+    vague_summary = vagueify(input_summary)
 
-summarized_summary = summarize(vague_summary)
+    summarized_summary = summarize(vague_summary)
 
-exact_regex = create_regex(summarized_summary, shortest_input_len, longest_input_len)
-print(exact_regex)
+    while summarized_summary[0]:
+        summarized_summary = summarize(summarized_summary[1])
+
+    exact_regex = create_regex(summarized_summary[1], shortest_input_len, longest_input_len)
+    print(exact_regex)
+
+if __name__ == "__main__":
+    main()
