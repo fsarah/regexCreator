@@ -62,21 +62,21 @@ def vagueify(input_summary):
                     char_array.append(char)
             if numbers > 1 and chars == 0:
                 input_summary[line] = []
-                input_summary[line].append("(0-9)")
+                input_summary[line].append("[0-9]")
             elif numbers > 1 and chars > 1:
                 input_summary[line] = []
-                input_summary[line].append("((0-9)|(a-z))")
+                input_summary[line].append("[0-9A-Z]")
             elif numbers > 1 and chars == 1:
                 input_summary[line] = []
-                input_summary[line].append("(0-9)")
+                input_summary[line].append("[0-9]")
                 input_summary[line].append(char_array.pop(0))
             elif numbers == 1 and chars > 1:
                 input_summary[line] = []
-                input_summary[line].append("(a-z)")
+                input_summary[line].append("[A-Z]")
                 input_summary[line].append(number_array.pop(0))
             elif numbers == 0 and chars > 0:
                 input_summary[line] = []
-                input_summary[line].append("(a-z)")
+                input_summary[line].append("[A-Z]")
     return input_summary
 
 # if multiple occurences of same possibilities right after each other, only add one with an asterisk
@@ -128,34 +128,37 @@ def summarize(vague_summary):
 
   return (changes, dictionary)
 
-def create_regex(input_summary, shortest_input_length, longest_input_length):
+def create_regex(input_summary, shortest_input_length):
     regex = ""
     input_len = 0
 
     for line in input_summary:
         input_len += 1
         elements = input_summary[line]
-        reg = re.compile(r'[(].*[)]')
+        reg = re.compile(r'[[].*[]]')
 
         if len(elements) == 1:
-            if input_len <= shortest_input_length:
+            if input_len < shortest_input_length:
                 regex = regex + elements[0]
             elif re.search(reg, elements[0]):
                 regex += elements[0] + "?"
             else:
-                regex = regex + "(" + elements[0] + ")?"
+                regex = regex + "[" + elements[0] + "]?"
         elif len(elements) > 1:
             tmp = ""
 
             for element in elements:
-                if tmp == "":
-                    tmp = tmp + element
-                else:
-                    tmp = tmp + "|" + element
-            if input_len <= shortest_input_length:
-                regex = regex + "(" + tmp + ")"
+                new_el = element.strip('[]')
+                #if tmp == "":
+                tmp = tmp + new_el
+                #else:
+                    #tmp = tmp + "|" + element
+
+            if input_len < shortest_input_length:
+                regex = regex + "[" + tmp + "]"
             else:
-                regex = regex + "(" + tmp + ")?"
+                regex = regex + "[" + tmp + "]?"
+
     return regex
 
 # Main Function
@@ -186,7 +189,7 @@ def main():
     while summarized_summary[0]:
         summarized_summary = summarize(summarized_summary[1])
 
-    exact_regex = create_regex(summarized_summary[1], shortest_input_len, longest_input_len)
+    exact_regex = create_regex(summarized_summary[1], shortest_input_len)
     print(exact_regex)
 
 if __name__ == "__main__":
