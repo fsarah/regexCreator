@@ -4,7 +4,7 @@ matches = []
 nonmatches = []
 
 f = open('test_long.txt', 'r')
-rex = re.compile(r"[0-9][5431C][ABC2][0-9]*[0-9]?[10a]?") # enter regex here
+rex = re.compile(r"[0-9][0-9A-ZC][A-Z2][0-9]*[0-9]?[10a]?") # enter regex here
 
 for line in f:
     newline = line.rstrip()

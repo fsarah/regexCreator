@@ -55,7 +55,7 @@ def vagueify(input_summary):
             upperchar_array = []
             lowerchars = 0
             lowerchar_array = []
-            
+
             for char in input_summary[line]:
                 if char.isdigit():
                     numbers += 1
@@ -67,6 +67,9 @@ def vagueify(input_summary):
                     else:
                         lowerchars += 1
                         lowerchar_array.append(char)
+            print("numbers: ", numbers)
+            print("upperchars: ", upperchars)
+            print("lowerchars: ", lowerchars)
 
             if numbers == 0 and lowerchars == 0 and upperchars == 1:
                 input_summary[line] = []
@@ -101,15 +104,27 @@ def vagueify(input_summary):
             elif numbers == 0 and lowerchars > 0 and upperchars == 0:
                 input_summary[line] = []
                 input_summary[line].append("[a-z]")
+
             elif numbers == 0 and lowerchars > 0 and upperchars > 0:
                 input_summary[line] = []
                 input_summary[line].append("[a-zA-Z]")
+            elif numbers == 1 and lowerchars == 0 and upperchars > 0:
+                input_summary[line] = []
+                input_summary[line].append("[A-Z]")
+                input_summary[line].append(number_array.pop(0))
+
             elif numbers > 1 and lowerchars == 0 and upperchars == 0:
                 input_summary[line] = []
                 input_summary[line].append("[0-9]")
+
             elif numbers > 1 and lowerchars == 0 and upperchars > 1:
                 input_summary[line] = []
                 input_summary[line].append("[0-9A-Z]")
+            elif numbers > 1 and lowerchars == 0 and upperchars == 1:
+                input_summary[line] = []
+                input_summary[line].append("[0-9A-Z]")
+                input_summary[line].append(upperchar_array.pop(0))
+
             elif numbers > 1 and lowerchars > 1 and upperchars == 0:
                 input_summary[line] = []
                 input_summary[line].append("[0-9a-z]")
