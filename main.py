@@ -55,6 +55,7 @@ def vagueify(input_summary):
             upperchar_array = []
             lowerchars = 0
             lowerchar_array = []
+            
             for char in input_summary[line]:
                 if char.isdigit():
                     numbers += 1
@@ -66,6 +67,7 @@ def vagueify(input_summary):
                     else:
                         lowerchars += 1
                         lowerchar_array.append(char)
+
             if numbers == 0 and lowerchars == 0 and upperchars == 1:
                 input_summary[line] = []
                 input_summary[line].append(upperchar_array.pop(0))
