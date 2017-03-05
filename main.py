@@ -50,33 +50,98 @@ def vagueify(input_summary):
     for line in input_summary:
         if len(input_summary[line]) > 1:
             numbers = 0
-            chars = 0
+            upperchars = 0
             number_array = []
-            char_array = []
+            upperchar_array = []
+            lowerchars = 0
+            lowerchar_array = []
             for char in input_summary[line]:
                 if char.isdigit():
                     numbers += 1
                     number_array.append(char)
                 if char.isalpha():
-                    chars += 1
-                    char_array.append(char)
-            if numbers > 1 and chars == 0:
+                    if char.isupper():
+                        upperchars += 1
+                        upperchar_array.append(char)
+                    else:
+                        lowerchars += 1
+                        lowerchar_array.append(char)
+            if numbers == 0 and lowerchars == 0 and upperchars == 1:
+                input_summary[line] = []
+                input_summary[line].append(upperchar_array.pop(0))
+            elif numbers == 0 and lowerchars == 1 and upperchars == 0:
+                input_summary[line] = []
+                input_summary[line].append(lowerchar_array.pop(0))
+            elif numbers == 0 and lowerchars == 1 and upperchars == 1:
+                input_summary[line] = []
+                input_summary[line].append(lowerchar_array.pop(0))
+                input_summary[line].append(upperchar_array.pop(0))
+            elif numbers == 1 and lowerchars == 0 and upperchars == 0:
+                input_summary[line] = []
+                input_summary[line].append(number_array.pop(0))
+            elif numbers == 1 and lowerchars == 0 and upperchars == 1:
+                input_summary[line] = []
+                input_summary[line].append(number_array.pop(0))
+                input_summary[line].append(upperchar_array.pop(0))
+            elif numbers == 1 and lowerchars == 1 and upperchars == 0:
+                input_summary[line] = []
+                input_summary[line].append(number_array.pop(0))
+                input_summary[line].append(lowerchar_array.pop(0))
+            elif numbers == 1 and lowerchars == 1 and upperchars == 1:
+                input_summary[line] = []
+                input_summary[line].append(number_array.pop(0))
+                input_summary[line].append(lowerchar_array.pop(0))
+                input_summary[line].append(upperchar_array.pop(0))
+
+            elif numbers == 0 and lowerchars == 0 and upperchars > 0:
+                input_summary[line] = []
+                input_summary[line].append("[A-Z]")
+            elif numbers == 0 and lowerchars > 0 and upperchars == 0:
+                input_summary[line] = []
+                input_summary[line].append("[a-z]")
+            elif numbers == 0 and lowerchars > 0 and upperchars > 0:
+                input_summary[line] = []
+                input_summary[line].append("[a-zA-Z]")
+            elif numbers > 1 and lowerchars == 0 and upperchars == 0:
                 input_summary[line] = []
                 input_summary[line].append("[0-9]")
-            elif numbers > 1 and chars > 1:
+            elif numbers > 1 and lowerchars == 0 and upperchars > 1:
                 input_summary[line] = []
                 input_summary[line].append("[0-9A-Z]")
-            elif numbers > 1 and chars == 1:
+            elif numbers > 1 and lowerchars > 1 and upperchars == 0:
+                input_summary[line] = []
+                input_summary[line].append("[0-9a-z]")
+            elif numbers > 1 and lowerchars > 1 and upperchars > 1:
+                input_summary[line] = []
+                input_summary[line].append("[0-9a-zA-Z]")
+
+            elif numbers > 1 and lowerchars > 1 and upperchars == 1:
+                input_summary[line] = []
+                input_summary[line].append("[0-9a-z]")
+                input_summary[line].append(upperchar_array.pop(0))
+            elif numbers > 1 and lowerchars == 1 and upperchars > 1:
+                input_summary[line] = []
+                input_summary[line].append("[0-9A-Z]")
+                input_summary[line].append(lowerchar_array.pop(0))
+            elif numbers > 1 and lowerchars == 1 and upperchars == 1:
                 input_summary[line] = []
                 input_summary[line].append("[0-9]")
-                input_summary[line].append(char_array.pop(0))
-            elif numbers == 1 and chars > 1:
+                input_summary[line].append(lowerchar_array.pop(0))
+                input_summary[line].append(upperchar_array.pop(0))
+            elif numbers == 1 and lowerchars > 1 and upperchars > 1:
+                input_summary[line] = []
+                input_summary[line].append("[a-zA-Z]")
+                input_summary[line].append(number_array.pop(0))
+            elif numbers == 1 and lowerchars > 1 and upperchars == 1:
+                input_summary[line] = []
+                input_summary[line].append("[a-z]")
+                input_summary[line].append(number_array.pop(0))
+                input_summary[line].append(upperchars.pop(0))
+            elif numbers == 1 and lowerchars == 1 and upperchars > 1:
                 input_summary[line] = []
                 input_summary[line].append("[A-Z]")
                 input_summary[line].append(number_array.pop(0))
-            elif numbers == 0 and chars > 0:
-                input_summary[line] = []
-                input_summary[line].append("[A-Z]")
+                input_summary[line].append(lowerchar_array.pop(0))
     return input_summary
 
 # if multiple occurences of same possibilities right after each other, only add one with an asterisk
