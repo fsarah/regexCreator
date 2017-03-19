@@ -1,4 +1,3 @@
-import os
 import re
 
 # Handles lines:
@@ -254,7 +253,7 @@ def create_regex(input_summary, shortest_input_length):
 
 # Main Function
 def main():
-    f = open('test4.txt', 'r')
+    f = open('nonrandom.txt', 'r')
 
     input_count = 0
     longest_input_len = 0
@@ -272,13 +271,17 @@ def main():
         longest_input_len += 1
 
     input_summary = simplify(input_summary)
+    #print(input_summary)
 
     vague_summary = vagueify(input_summary)
+    #print(vague_summary)
 
     summarized_summary = summarize(vague_summary)
+    #print(summarized_summary)
 
     while summarized_summary[0]:
         summarized_summary = summarize(summarized_summary[1])
+        #print(summarized_summary)
 
     exact_regex = create_regex(summarized_summary[1], shortest_input_len)
     print(exact_regex)
