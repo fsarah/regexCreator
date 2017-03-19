@@ -1,10 +1,12 @@
 import re
+import os
 
 matches = []
 nonmatches = []
 
-f = open('test_long.txt', 'r')
-rex = re.compile(r"[0-9][0-9A-Z]*[0-9]*[0-9]?[2]?[a]?") # enter regex here
+filepath = os.path.join(os.path.dirname(__file__), 'tests/threshold_testset.txt')
+f = open(filepath, 'r')
+rex = re.compile(r"[ACD][134][245][356][467]") # enter regex here
 
 for line in f:
     newline = line.rstrip()

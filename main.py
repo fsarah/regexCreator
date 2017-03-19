@@ -1,3 +1,4 @@
+import os
 import re
 
 # Handles lines:
@@ -46,7 +47,7 @@ def simplify(input_summary):
 
 #if more than certain number of letters/numbers, replace with [a-z] or [0-9]
 def vagueify(input_summary):
-    threshold = 2
+    threshold = 5
 
     for line in input_summary:
         if len(input_summary[line]) > 1:
@@ -253,7 +254,9 @@ def create_regex(input_summary, shortest_input_length):
 
 # Main Function
 def main():
-    f = open('nonrandom.txt', 'r')
+    input_file = 'tests/threshold_tests.txt'
+    filepath = os.path.join(os.path.dirname(__file__), input_file)
+    f = open(filepath, 'r')
 
     input_count = 0
     longest_input_len = 0
