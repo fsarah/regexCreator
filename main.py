@@ -45,9 +45,30 @@ def simplify(input_summary):
         simplified_summary[line] = new_list
     return simplified_summary
 
+
+def string_helper(character_list):
+    threshold = 3
+    char_string = ""
+
+    if (len(character_list) >= threshold):
+        element = character_list[0]
+
+        if element.isdigit():
+            char_string = "[0-9]"
+        elif element.isupper():
+            char_string = "[A-Z]"
+        else:
+            char_string = "[a-z]"
+
+    elif (len(character_list) > 0):
+        for character in character_list:
+            char_string += character
+
+    return char_string
+
+
 #if more than certain number of letters/numbers, replace with [a-z] or [0-9]
 def vagueify(input_summary):
-    threshold = 5
 
     for line in input_summary:
         if len(input_summary[line]) > 1:
@@ -70,104 +91,11 @@ def vagueify(input_summary):
                         lowerchars += 1
                         lowerchar_array.append(char)
 
-            if numbers == 0 and lowerchars == 0 and upperchars == 1:
-                input_summary[line] = []
-                input_summary[line].append(upperchar_array.pop(0))
-            elif numbers == 0 and lowerchars == 1 and upperchars == 0:
-                input_summary[line] = []
-                input_summary[line].append(lowerchar_array.pop(0))
-            elif numbers == 0 and lowerchars == 1 and upperchars == 1:
-                input_summary[line] = []
-                input_summary[line].append(lowerchar_array.pop(0))
-                input_summary[line].append(upperchar_array.pop(0))
-            elif numbers == 1 and lowerchars == 0 and upperchars == 0:
-                input_summary[line] = []
-                input_summary[line].append(number_array.pop(0))
-            elif numbers == 1 and lowerchars == 0 and upperchars == 1:
-                input_summary[line] = []
-                input_summary[line].append(number_array.pop(0))
-                input_summary[line].append(upperchar_array.pop(0))
-            elif numbers == 1 and lowerchars == 1 and upperchars == 0:
-                input_summary[line] = []
-                input_summary[line].append(number_array.pop(0))
-                input_summary[line].append(lowerchar_array.pop(0))
-            elif numbers == 1 and lowerchars == 1 and upperchars == 1:
-                input_summary[line] = []
-                input_summary[line].append(number_array.pop(0))
-                input_summary[line].append(lowerchar_array.pop(0))
-                input_summary[line].append(upperchar_array.pop(0))
-            elif numbers == 0 and lowerchars == 0 and upperchars >= threshold:
-                input_summary[line] = []
-                input_summary[line].append("[A-Z]")
-            elif numbers == 0 and lowerchars >= threshold and upperchars == 0:
-                input_summary[line] = []
-                input_summary[line].append("[a-z]")
-            elif numbers == 0 and lowerchars >= threshold and upperchars >= threshold:
-                input_summary[line] = []
-                input_summary[line].append("[a-zA-Z]")
-            elif numbers == 1 and lowerchars == 0 and upperchars >= threshold:
-                input_summary[line] = []
-                input_summary[line].append("[A-Z]")
-                input_summary[line].append(number_array.pop(0))
-            elif numbers >= threshold and lowerchars == 0 and upperchars == 0:
-                input_summary[line] = []
-                input_summary[line].append("[0-9]")
-            elif numbers >= threshold and lowerchars == 0 and upperchars >= threshold:
-                input_summary[line] = []
-                input_summary[line].append("[0-9A-Z]")
-            elif numbers >= threshold and lowerchars == 0 and upperchars == 1:
-                input_summary[line] = []
-                input_summary[line].append("[0-9A-Z]")
-                input_summary[line].append(upperchar_array.pop(0))
-            elif numbers >= threshold and lowerchars >= threshold and upperchars == 0:
-                input_summary[line] = []
-                input_summary[line].append("[0-9a-z]")
-            elif numbers >= threshold and lowerchars >= threshold and upperchars >= threshold:
-                input_summary[line] = []
-                input_summary[line].append("[0-9a-zA-Z]")
-            elif numbers >= threshold and lowerchars >= threshold and upperchars == 1:
-                input_summary[line] = []
-                input_summary[line].append("[0-9a-z]")
-                input_summary[line].append(upperchar_array.pop(0))
-            elif numbers >= threshold and lowerchars == 1 and upperchars >= threshold:
-                input_summary[line] = []
-                input_summary[line].append("[0-9A-Z]")
-                input_summary[line].append(lowerchar_array.pop(0))
-            elif numbers >= threshold and lowerchars == 1 and upperchars == 1:
-                input_summary[line] = []
-                input_summary[line].append("[0-9]")
-                input_summary[line].append(lowerchar_array.pop(0))
-                input_summary[line].append(upperchar_array.pop(0))
-            elif numbers == 1 and lowerchars >= threshold and upperchars >= threshold:
-                input_summary[line] = []
-                input_summary[line].append("[a-zA-Z]")
-                input_summary[line].append(number_array.pop(0))
-            elif numbers == 1 and lowerchars >= threshold and upperchars == 1:
-                input_summary[line] = []
-                input_summary[line].append("[a-z]")
-                input_summary[line].append(number_array.pop(0))
-                input_summary[line].append(upperchars.pop(0))
-            elif numbers == 1 and lowerchars == 1 and upperchars >= threshold:
-                input_summary[line] = []
-                input_summary[line].append("[A-Z]")
-                input_summary[line].append(number_array.pop(0))
-                input_summary[line].append(lowerchar_array.pop(0))
-            elif numbers == 0 and lowerchars == 1 and upperchars >= threshold:
-                input_summary[line] = []
-                input_summary[line].append("[A-Z]")
-                input_summary[line].append(lowerchar_array.pop(0))
-            elif numbers == 0 and lowerchars >= threshold and upperchars == 1:
-                input_summary[line] = []
-                input_summary[line].append("[a-z]")
-                input_summary[line].append(upperchar_array.pop(0))
-            elif numbers == 1 and lowerchars >= threshold and upperchars == 0:
-                input_summary[line] = []
-                input_summary[line].append("[a-z]")
-                input_summary[line].append(number_array.pop(0))
-            elif numbers >= threshold and lowerchars == 1 and upperchars == 0:
-                input_summary[line] = []
-                input_summary[line].append("[0-9]")
-                input_summary[line].append(lowerchar_array.pop(0))
+            input_summary[line] = []
+            input_summary[line].append(string_helper(number_array))
+            input_summary[line].append(string_helper(lowerchar_array))
+            input_summary[line].append(string_helper(upperchar_array))
+
     return input_summary
 
 # if multiple occurences of same possibilities right after each other, only add one with an asterisk
@@ -254,7 +182,7 @@ def create_regex(input_summary, shortest_input_length):
 
 # Main Function
 def main():
-    input_file = 'tests/threshold_tests.txt'
+    input_file = 'tests/guitar_test.txt'
     filepath = os.path.join(os.path.dirname(__file__), input_file)
     f = open(filepath, 'r')
 
