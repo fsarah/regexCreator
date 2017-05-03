@@ -204,10 +204,11 @@ def main():
         longest_input_len += 1
 
     input_summary = simplify(input_summary)
-    # print(input_summary)
+    print('output #1 = ' + str(input_summary))
 
-    vague_summary = vagueify(input_summary)
-    # print(vague_summary)
+    vague_summary = vagueify(input_summary) # comment out code if using exhaustive input
+    # vague_summary = input_summary # uncomment code if using exhaustive input
+    print('output #2 = ' + str(vague_summary))
 
     summarized_summary = summarize(vague_summary)
     # print(summarized_summary)
@@ -217,7 +218,7 @@ def main():
         # print(summarized_summary)
 
     exact_regex = create_regex(summarized_summary[1], shortest_input_len)
-    print(exact_regex)
+    print('regEx = ' + str(exact_regex))
 
 if __name__ == "__main__":
     main()
