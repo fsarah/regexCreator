@@ -142,7 +142,14 @@ def summarize(vague_summary):
                 vague_summary[line] = []
                 if not re.search(reg_star, str(vague_summary[line-1])):
                     temp_string = ''.join(vague_summary[line-1])
-                    temp_string = temp_string + '+'
+                    if temp_string == '[0-9][A-Z]' or temp_string == '[A-Z][0-9]':
+                        temp_string = '[0-9A-Z]'
+                    elif temp_string == '[0-9][a-z]' or temp_string == '[a-z][0-9]':
+                        temp_string = '[0-9a-z]'
+                    elif temp_string == '[A-Z][a-z]' or temp_string == '[a-z][A-Z]':
+                        temp_string = '[A-Z][a-z]'
+                    if temp_string[-1] != '+':
+                        temp_string = temp_string + '+'
                     vague_summary[line - 1] = [temp_string]
                     pop_these.append(line)
                 changes = True
