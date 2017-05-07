@@ -1,0 +1,6 @@
+Airbus A300
+Airbus A319neo
+Airbus A330-200
+Airbus A330-200F
+Airbus A340-200/300
+Airbus A350-1000

@@ -189,7 +189,7 @@ def create_regex(input_summary, shortest_input_length):
                 new_el = element.strip('[]')
                 tmp = tmp + new_el
 
-            if input_len < shortest_input_length:
+            if input_len <= shortest_input_length:
                 regex = regex + '[' + tmp + ']'
             else:
                 regex = regex + '[' + tmp + ']?'
