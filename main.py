@@ -226,11 +226,8 @@ def main():
     print('output #2 = ' + str(vague_summary))
 
     summarized_summary = summarize(vague_summary)
-    # print(summarized_summary)
-
     while summarized_summary[0]:
         summarized_summary = summarize(summarized_summary[1])
-        # print(summarized_summary)
 
     exact_regex = create_regex(summarized_summary[1], shortest_input_len)
     print('regEx = ' + str(exact_regex))
