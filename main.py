@@ -176,8 +176,12 @@ def create_regex(input_summary, shortest_input_length):
         reg = re.compile(r'[[].*[]]')
 
         if len(elements) == 1:
-            if input_len < shortest_input_length:
-                regex = regex + elements[0]
+            if input_len <= shortest_input_length:
+                el = elements[0]
+                if len(el) > 1 and el[-1] is not ']':
+                    regex = regex + '[' + elements[0] + ']'
+                else:
+                    regex = regex + elements[0]
             elif re.search(reg, elements[0]):
                 regex += elements[0] + '?'
             else:
