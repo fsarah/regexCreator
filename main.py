@@ -49,7 +49,7 @@ def simplify(input_summary):
 
 
 def string_helper(character_list):
-    threshold = 3
+    threshold = 2
     char_string = ''
 
     if len(character_list) >= threshold:
@@ -109,16 +109,30 @@ def vagueify(input_summary):
     return input_summary
 
 
-# if multiple occurrences of same possibilities right after each other, only add one with an asterisk
+def checkpart(_r1, _r2):
+    r1 = _r1.strip('+')
+    r2 = _r2.strip('+')
+
+    if (r2 == '[A-Z]' or r2 == '[A-Z]+') and (r1 == '[0-9A-Z]' or r1 == '[A-Za-z]'):
+        return True
+    elif (r2 == '[0-9]' or r2 == '[0-9]+') and (r1 == '[0-9A-Z]' or r1 == '[0-9a-z]'):
+        return True
+    elif (r2 == '[a-z]' or r2 == '[a-z]+') and (r1 == '[A-Za-z]' or r1 == '[0-9a-z]'):
+        return True
+    else:
+        return False
+
+
+# if multiple occurrences of same possibilities right after each other, only add one with a plus
 def summarize(vague_summary):
     changes = False
-    reg_star = re.compile(r'(.*)[*]')
+    reg_plus = re.compile(r'(.*)[+]')
     pop_these = []
 
     for line in vague_summary:
         if line > 0:
-            val1 = vague_summary[line]
-            val2 = vague_summary[line - 1]
+            val1 = vague_summary[line - 1]
+            val2 = vague_summary[line]
             tempval = ''
 
             if re.match(r'[(]', str(val1)):
@@ -130,28 +144,49 @@ def summarize(vague_summary):
             if re.match(r'[(]', str(val2)):
                 for i in 1, (len(val1) - 1):
                     tempval += val1[i]
-                val1 = tempval
+                val2 = tempval
 
-            if len(val2) > len(val1):
-                temp = val1
-                val1 = val2
-                val2 = temp
+            #if len(val2) > len(val1):
+            #    temp = val1
+            #    val1 = val2
+            #    val2 = temp
 
-            reg_ex = ''.join(val2)
-            if reg_ex == ''.join(val1):
+            reg_ex1 = ''.join(val1)
+            reg_ex2 = ''.join(val2)
+
+            if reg_ex1 == reg_ex2 or reg_ex1 == reg_ex2.strip('+'):
+                print("here")
+                print(reg_ex1)
+                print(reg_ex2)
                 vague_summary[line] = []
-                if not re.search(reg_star, str(vague_summary[line-1])):
+                if not re.search(reg_plus, str(vague_summary[line-1])):
                     temp_string = ''.join(vague_summary[line-1])
                     if temp_string == '[0-9][A-Z]' or temp_string == '[A-Z][0-9]':
                         temp_string = '[0-9A-Z]'
                     elif temp_string == '[0-9][a-z]' or temp_string == '[a-z][0-9]':
                         temp_string = '[0-9a-z]'
                     elif temp_string == '[A-Z][a-z]' or temp_string == '[a-z][A-Z]':
-                        temp_string = '[A-Z][a-z]'
+                        temp_string = '[A-Za-z]'
                     if temp_string[-1] != '+':
                         temp_string = temp_string + '+'
-                    vague_summary[line - 1] = [temp_string]
+
+                    if len(vague_summary[line - 1]) <= len(temp_string):
+                        vague_summary[line - 1] = [temp_string]
                     pop_these.append(line)
+                changes = True
+
+            elif checkpart(reg_ex1, reg_ex2):
+                print("elsehere")
+                print(reg_ex1)
+                print(reg_ex2)
+                temp_string = reg_ex1
+                if reg_ex1[-1] != '+':
+                    temp_string = temp_string + '+'
+                vague_summary[line - 1] = temp_string
+                print(line)
+                print(vague_summary[line])
+                vague_summary[line] = ''
+                pop_these.append(line)
                 changes = True
 
     decluttered_list = []
@@ -163,6 +198,7 @@ def summarize(vague_summary):
     for i in range(0, len(decluttered_list)):
         dictionary[i] = decluttered_list[i]
 
+    print("changed: ", dictionary)
     return changes, dictionary
 
 
@@ -178,7 +214,7 @@ def create_regex(input_summary, shortest_input_length):
         if len(elements) == 1:
             if input_len <= shortest_input_length:
                 el = elements[0]
-                if len(el) > 1 and el[-1] is not ']':
+                if len(el) > 1 and el[-1] is not ']' and el[-1] is not '?' and el[-1] is not '+':
                     regex = regex + '[' + elements[0] + ']'
                 else:
                     regex = regex + elements[0]
@@ -203,7 +239,7 @@ def create_regex(input_summary, shortest_input_length):
 
 # Main Function
 def main():
-    input_file = 'tests/guitar_learn.txt'
+    input_file = 'tests/test4_learn.txt'
     filepath = os.path.join(os.path.dirname(__file__), input_file)
     f = open(filepath, 'r')
 
