@@ -113,18 +113,24 @@ def checkpart(_r1, _r2):
     r1 = _r1.strip('+')
     r2 = _r2.strip('+')
 
-    if (r2 == '[A-Z]' or r2 == '[A-Z]+') and (r1 == '[0-9A-Z]' or r1 == '[A-Za-z]'):
+    if (r1 == '[0-9A-Z]' or r1 == '[A-Za-z]') and (r2 == '[A-Z]' or r2 == '[A-Z]+'):
         return True
-    elif (r2 == '[0-9]' or r2 == '[0-9]+') and (r1 == '[0-9A-Z]' or r1 == '[0-9a-z]'):
+    elif (r1 == '[0-9A-Z]' or r1 == '[0-9a-z]') and (r2 == '[0-9]' or r2 == '[0-9]+'):
         return True
-    elif (r2 == '[a-z]' or r2 == '[a-z]+') and (r1 == '[A-Za-z]' or r1 == '[0-9a-z]'):
+    elif (r1 == '[A-Za-z]' or r1 == '[0-9a-z]') and (r2 == '[a-z]' or r2 == '[a-z]+'):
+        return True
+    elif (r1 == '[0-9A-Z]') and (r2.isnumeric() or r2.isupper()):
+        return True
+    elif (r1 == '[0-9a-z]') and (r2.isnumeric() or r2.islower()):
+        return True
+    elif (r1 == '[A-Za-z]') and (r2.isupper() or r2.islower()):
         return True
     else:
         return False
 
 
 # if multiple occurrences of same possibilities right after each other, only add one with a plus
-def summarize(vague_summary):
+def summarize(vague_summary, helper_list):
     changes = False
     reg_plus = re.compile(r'(.*)[+]')
     pop_these = []
@@ -155,9 +161,6 @@ def summarize(vague_summary):
             reg_ex2 = ''.join(val2)
 
             if reg_ex1 == reg_ex2 or reg_ex1 == reg_ex2.strip('+'):
-                print("here")
-                print(reg_ex1)
-                print(reg_ex2)
                 vague_summary[line] = []
                 if not re.search(reg_plus, str(vague_summary[line-1])):
                     temp_string = ''.join(vague_summary[line-1])
@@ -176,15 +179,10 @@ def summarize(vague_summary):
                 changes = True
 
             elif checkpart(reg_ex1, reg_ex2):
-                print("elsehere")
-                print(reg_ex1)
-                print(reg_ex2)
                 temp_string = reg_ex1
                 if reg_ex1[-1] != '+':
                     temp_string = temp_string + '+'
                 vague_summary[line - 1] = temp_string
-                print(line)
-                print(vague_summary[line])
                 vague_summary[line] = ''
                 pop_these.append(line)
                 changes = True
@@ -198,11 +196,16 @@ def summarize(vague_summary):
     for i in range(0, len(decluttered_list)):
         dictionary[i] = decluttered_list[i]
 
-    print("changed: ", dictionary)
-    return changes, dictionary
+    temp_list = []
+    for index in range(len(helper_list)):
+        if index not in pop_these:
+            temp_list.append(helper_list[index])
+
+    #print("changed: ", dictionary)
+    return changes, dictionary, temp_list
 
 
-def create_regex(input_summary, shortest_input_length):
+def create_regex(input_summary, shortest_input_length, helper_list):
     regex = ''
     input_len = 0
 
@@ -212,7 +215,7 @@ def create_regex(input_summary, shortest_input_length):
         reg = re.compile(r'[[].*[]]')
 
         if len(elements) == 1:
-            if input_len <= shortest_input_length:
+            if helper_list[input_len-1] <= shortest_input_length:
                 el = elements[0]
                 if len(el) > 1 and el[-1] is not ']' and el[-1] is not '?' and el[-1] is not '+':
                     regex = regex + '[' + elements[0] + ']'
@@ -222,17 +225,18 @@ def create_regex(input_summary, shortest_input_length):
                 regex += elements[0] + '?'
             else:
                 regex = regex + '[' + elements[0] + ']?'
+
         elif len(elements) > 1:
-            tmp = ''
+            #tmp = ''
+            #for element in elements:
+            #    new_el = element.strip('[]')
+            #    tmp = tmp + element
+            #    print(tmp)
 
-            for element in elements:
-                new_el = element.strip('[]')
-                tmp = tmp + new_el
-
-            if input_len <= shortest_input_length:
-                regex = regex + '[' + tmp + ']'
+            if helper_list[input_len-1] <= shortest_input_length:
+                regex = regex + elements #'[' + tmp + ']'
             else:
-                regex = regex + '[' + tmp + ']?'
+                regex = regex + '[' + elements + ']?'
 
     return regex
 
@@ -265,11 +269,13 @@ def main():
     # vague_summary = input_summary # uncomment code if using exhaustive input
     print('output #2 = ' + str(vague_summary))
 
-    summarized_summary = summarize(vague_summary)
-    while summarized_summary[0]:
-        summarized_summary = summarize(summarized_summary[1])
+    helper_list = list(range(0, len(vague_summary)))
 
-    exact_regex = create_regex(summarized_summary[1], shortest_input_len)
+    changes, summarized_summary, helper_list = summarize(vague_summary, helper_list)
+    while changes:
+        changes, summarized_summary, helper_list = summarize(summarized_summary, helper_list)
+
+    exact_regex = create_regex(summarized_summary, shortest_input_len, helper_list)
     print('regEx = ' + str(exact_regex))
 
 if __name__ == '__main__':
