@@ -160,7 +160,7 @@ def summarize(vague_summary, helper_list):
             reg_ex1 = ''.join(val1)
             reg_ex2 = ''.join(val2)
 
-            if reg_ex1 == reg_ex2 or reg_ex1 == reg_ex2.strip('+'):
+            if reg_ex1 == reg_ex2 or reg_ex1 == reg_ex2.strip('+') or reg_ex1.strip('+') == reg_ex2:
                 vague_summary[line] = []
                 if not re.search(reg_plus, str(vague_summary[line-1])):
                     temp_string = ''.join(vague_summary[line-1])
@@ -207,15 +207,13 @@ def summarize(vague_summary, helper_list):
 
 def create_regex(input_summary, shortest_input_length, helper_list):
     regex = ''
-    input_len = 0
 
     for line in input_summary:
-        input_len += 1
         elements = input_summary[line]
         reg = re.compile(r'[[].*[]]')
 
         if len(elements) == 1:
-            if helper_list[input_len-1] <= shortest_input_length:
+            if helper_list[line] < shortest_input_length:
                 el = elements[0]
                 if len(el) > 1 and el[-1] is not ']' and el[-1] is not '?' and el[-1] is not '+':
                     regex = regex + '[' + elements[0] + ']'
@@ -227,23 +225,22 @@ def create_regex(input_summary, shortest_input_length, helper_list):
                 regex = regex + '[' + elements[0] + ']?'
 
         elif len(elements) > 1:
-            #tmp = ''
-            #for element in elements:
-            #    new_el = element.strip('[]')
-            #    tmp = tmp + element
-            #    print(tmp)
+            tmp = ''
+            for element in elements:
+                new_el = element.strip('[]')
+                tmp = tmp + new_el
 
-            if helper_list[input_len-1] <= shortest_input_length:
-                regex = regex + elements #'[' + tmp + ']'
+            if helper_list[line] < shortest_input_length:
+                regex = regex + '[' + tmp + ']'
             else:
-                regex = regex + '[' + elements + ']?'
+                regex = regex + '[' + tmp + ']?'
 
     return regex
 
 
 # Main Function
 def main():
-    input_file = 'tests/test4_learn.txt'
+    input_file = 'tests/airbus_learn.txt'
     filepath = os.path.join(os.path.dirname(__file__), input_file)
     f = open(filepath, 'r')
 
