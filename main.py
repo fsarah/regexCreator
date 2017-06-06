@@ -152,11 +152,6 @@ def summarize(vague_summary, helper_list):
                     tempval += val1[i]
                 val2 = tempval
 
-            #if len(val2) > len(val1):
-            #    temp = val1
-            #    val1 = val2
-            #    val2 = temp
-
             reg_ex1 = ''.join(val1)
             reg_ex2 = ''.join(val2)
 
@@ -201,7 +196,6 @@ def summarize(vague_summary, helper_list):
         if index not in pop_these:
             temp_list.append(helper_list[index])
 
-    #print("changed: ", dictionary)
     return changes, dictionary, temp_list
 
 
@@ -215,7 +209,7 @@ def create_regex(input_summary, shortest_input_length, helper_list):
         if len(elements) == 1:
             if helper_list[line] < shortest_input_length:
                 el = elements[0]
-                if len(el) > 1 and el[-1] is not ']' and el[-1] is not '?' and el[-1] is not '+':
+                if len(el) > 1 and el[-1] != ']' and el[-1] != '?' and el[-1] != '+':
                     regex = regex + '[' + elements[0] + ']'
                 else:
                     regex = regex + elements[0]
@@ -226,21 +220,26 @@ def create_regex(input_summary, shortest_input_length, helper_list):
 
         elif len(elements) > 1:
             tmp = ''
-            for element in elements:
-                new_el = element.strip('[]')
-                tmp = tmp + new_el
-
-            if helper_list[line] < shortest_input_length:
-                regex = regex + '[' + tmp + ']'
+            if elements != "[0-9A-Z]+" and elements != "[0-9a-z]+" and elements != "[A-Za-z]+":
+                for element in elements:
+                    new_el = element.strip('[]')
+                    tmp = tmp + new_el
             else:
+                tmp = elements
+
+            if helper_list[line] < shortest_input_length and tmp[-1] != '+':
+                regex = regex + '[' + tmp + ']'
+            elif helper_list[line] >= shortest_input_length:
                 regex = regex + '[' + tmp + ']?'
+            else:
+                regex = regex + tmp
 
     return regex
 
 
 # Main Function
 def main():
-    input_file = 'tests/airbus_learn.txt'
+    input_file = 'tests/test4_learn.txt'
     filepath = os.path.join(os.path.dirname(__file__), input_file)
     f = open(filepath, 'r')
 
@@ -260,11 +259,11 @@ def main():
         longest_input_len += 1
 
     input_summary = simplify(input_summary)
-    print('output #1 = ' + str(input_summary))
+    # print('output #1 = ' + str(input_summary))
 
     vague_summary = vagueify(input_summary) # comment out code if using exhaustive input
     # vague_summary = input_summary # uncomment code if using exhaustive input
-    print('output #2 = ' + str(vague_summary))
+    # print('output #2 = ' + str(vague_summary))
 
     helper_list = list(range(0, len(vague_summary)))
 
